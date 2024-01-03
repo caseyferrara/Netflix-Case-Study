@@ -10,6 +10,6 @@ The streaming market is increasingly competitive, with numerous platforms vying 
 
 ### 1.2 Stakeholders
 
-Netflix's Content Strategy Team
-Marketing Department
-Investors and Analysts
+* Netflix's Content Strategy Team  
+* Marketing Department  
+* Investors and Analysts  
