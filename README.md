@@ -81,3 +81,56 @@ I used the ISBLANK() function in Google Sheets to identify missing values across
 ### 4.4 Importing Dataset into BigQuery
 
 After completing the data cleaning process in Google Sheets, I started importing the dataset into BigQuery for analysis. This began with exporting the dataset from Google Sheets as a CSV file, ensuring compatibility with BigQuery. The CSV file was then uploaded to Google Cloud Storage, which acts as a bridge for transferring data to BigQuery. In BigQuery, we created a new dataset and established a table with a schema reflecting the CSV file's structure and data types. The final step involved importing the data from Google Cloud Storage into this BigQuery table, carefully configuring the import settings to align with the dataset's format and structure.
+
+## 5. Analyze
+
+In our analysis phase, I'm focusing on key aspects of Netflix's content evolution. I'll examine genre distribution over time to see which genres have become more or less prevalent, reflecting shifts in viewer preferences. Another aspect is the balance between movies and TV shows, determining if there's a trend favoring one content type. We'll also analyze the release years of titles to understand if Netflix is focusing on newer or older content. Additionally, we'll explore content diversity across different geographical regions to see if Netflix's library varies by region. This analysis aims to provide a nuanced understanding of how Netflix's content strategy has evolved, offering insights for data-driven decisions.
+
+### 5.1 Genre Distribution Trends
+
+In my Genre Distribution Trends analysis, I'll explore the changes of genres on Netflix over the years. This will reveal shifts in viewer preferences and adaptations in Netflix's portfolio. My focus will be on identifying trends. This analysis aims to understand Netflix's content diversification strategy which will provide insights into its content acquisition and production decisions.
+
+```
+WITH SplitGenres AS (
+  SELECT 
+    release_year, 
+    title,
+    genre
+  FROM 
+    `data-project-99299.netflix.netflix_titles`,
+    UNNEST(SPLIT(listed_in, ', ')) AS genre
+),
+GenreCounts AS (
+  SELECT 
+    release_year, 
+    genre, 
+    COUNT(title) AS title_count
+  FROM 
+    SplitGenres
+  GROUP BY 
+    release_year, genre
+),
+YearlyGenreTrends AS (
+  SELECT 
+    release_year, 
+    genre, 
+    title_count,
+    SUM(title_count) OVER (PARTITION BY release_year) AS total_titles_year,
+    (title_count / SUM(title_count) OVER (PARTITION BY release_year)) * 100 AS genre_percentage_year
+  FROM 
+    GenreCounts
+)
+SELECT 
+  release_year, 
+  genre, 
+  title_count,
+  genre_percentage_year
+FROM 
+  YearlyGenreTrends
+ORDER BY 
+  release_year, genre_percentage_year DESC
+```
+Key insights from the analysis:
+* In the last five years, International Movies have consistently been one of the top genres on Netflix. This indicates a strong focus on diversifying content to cater to a global audience.
+* The genre Dramas remains at the top, consistently ranking among the top three genres. This genre's popularity highlights its appeal across different viewer segments.
+* While international content and dramas dominate, there's also a notable presence of other genres like 'Comedies' and 'Documentaries', reflecting Netflix's strategy to maintain a varied content portfolio.
