@@ -134,3 +134,45 @@ Key insights from the analysis:
 * In the last five years, International Movies have consistently been one of the top genres on Netflix. This indicates a strong focus on diversifying content to cater to a global audience.
 * The genre Dramas remains at the top, consistently ranking among the top three genres. This genre's popularity highlights its appeal across different viewer segments.
 * While international content and dramas dominate, there's also a notable presence of other genres like 'Comedies' and 'Documentaries', reflecting Netflix's strategy to maintain a varied content portfolio.
+
+## 5.2 Content Type Balance
+
+I will investigate the historical trend in Netflix's catalog, specifically examining the balance between movies and TV shows over time. This analysis will utilize SQL queries to quantify and compare the proportions of movies and TV shows released each year, which will reveal any shifts in Netflix's content strategy. I want to determine whether there's a noticeable trend towards either movies or TV series, reflecting on how Netflix adapts its content offerings in response to consumer preferences and market trends.
+
+```
+WITH ContentCount AS (
+  SELECT 
+    release_year, 
+    type, 
+    COUNT(show_id) AS count
+  FROM 
+    `data-project-99299.netflix.netflix_titles`
+  GROUP BY 
+    release_year, type
+),
+TotalCountPerYear AS (
+  SELECT 
+    release_year, 
+    SUM(count) AS total_count
+  FROM 
+    ContentCount
+  GROUP BY 
+    release_year
+)
+SELECT 
+  a.release_year, 
+  a.type, 
+  a.count,
+  (a.count / b.total_count) * 100 AS type_percentage
+FROM 
+  ContentCount a
+JOIN 
+  TotalCountPerYear b ON a.release_year = b.release_year
+ORDER BY 
+  a.release_year, a.type
+```
+
+Key insights from analysis:
+* There's a clear trend showing a gradual shift from movies to TV shows. In earlier years like 2012 and 2013, movies dominated the content significantly, accounting for over 75% of the titles. However, by 2021, this trend reversed, with TV shows comprising approximately 56% of the content.
+* The increasing percentage of TV shows from 2015 onwards, with a notable jump around 2019-2020, reflects Netflix's emphasis on serialized content. This could be in response to consumer preferences for binge-watching and the success of original series.
+* This shift might be part of a broader diversification strategy, aiming to offer a more balanced mix of movies and series to cater to varied viewer preferences and compete with other streaming services.
