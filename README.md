@@ -130,12 +130,12 @@ FROM
 ORDER BY 
   release_year, genre_percentage_year DESC
 ```
-Key insights from the analysis:
+Key Insights:
 * In the last five years, International Movies have consistently been one of the top genres on Netflix. This indicates a strong focus on diversifying content to cater to a global audience.
 * The genre Dramas remains at the top, consistently ranking among the top three genres. This genre's popularity highlights its appeal across different viewer segments.
 * While international content and dramas dominate, there's also a notable presence of other genres like 'Comedies' and 'Documentaries', reflecting Netflix's strategy to maintain a varied content portfolio.
 
-## 5.2 Content Type Balance
+### 5.2 Content Type Balance
 
 I will investigate the historical trend in Netflix's catalog, specifically examining the balance between movies and TV shows over time. This analysis will utilize SQL queries to quantify and compare the proportions of movies and TV shows released each year, which will reveal any shifts in Netflix's content strategy. I want to determine whether there's a noticeable trend towards either movies or TV series, reflecting on how Netflix adapts its content offerings in response to consumer preferences and market trends.
 
@@ -172,7 +172,92 @@ ORDER BY
   a.release_year, a.type
 ```
 
-Key insights from analysis:
+Key Insights:
 * There's a clear trend showing a gradual shift from movies to TV shows. In earlier years like 2012 and 2013, movies dominated the content significantly, accounting for over 75% of the titles. However, by 2021, this trend reversed, with TV shows comprising approximately 56% of the content.
 * The increasing percentage of TV shows from 2015 onwards, with a notable jump around 2019-2020, reflects Netflix's emphasis on serialized content. This could be in response to consumer preferences for binge-watching and the success of original series.
 * This shift might be part of a broader diversification strategy, aiming to offer a more balanced mix of movies and series to cater to varied viewer preferences and compete with other streaming services.
+
+### 5.3 Release Year Analysis
+
+I decided to calculate the yearly growth rate in the number of titles on Netflix, aiming to identify trends in their content strategy. This approach allows us to quantify the year-over-year changes in Netflix's content library, offering insights into periods of significant expansion or strategic shifts. By analyzing these growth rates, we can figure out whether there has been an acceleration in adding new content, which indicates a focus on keeping the library fresh and up-to-date. Alternatively, steady or moderate growth rates might suggest a more balanced approach, maintaining a mix of new and existing titles.
+
+```
+WITH YearlyTitleCount AS (
+  SELECT 
+    release_year,
+    COUNT(show_id) AS title_count
+  FROM 
+    `data-project-99299.netflix.netflix_titles`
+  GROUP BY 
+    release_year
+),
+YearlyGrowth AS (
+  SELECT 
+    release_year,
+    title_count,
+    LAG(title_count) OVER (ORDER BY release_year) AS previous_year_count
+  FROM 
+    YearlyTitleCount
+)
+SELECT 
+  release_year,
+  title_count,
+  previous_year_count,
+  ((title_count - previous_year_count) / previous_year_count) * 100 AS growth_rate
+FROM 
+  YearlyGrowth
+WHERE 
+  previous_year_count IS NOT NULL
+ORDER BY 
+  release_year DESC
+```
+
+Key Insights:
+* Between 2015 and 2016, there's a marked increase in the growth rate, with 2016 showing a 62.84% increase in title count from the previous year. This period likely represents a phase of aggressive expansion in Netflix's content library.
+* The variation in growth rates, especially in recent years, could reflect Netflix's response to the evolving streaming market, viewer preferences, and competition.
+* The data suggests a strategic curation of content by Netflix, balancing the addition of new titles with the removal of existing ones, possibly to maintain a relevant catalog.
+
+### 5.4 Geographical Variance
+
+In my Geographical Variance analysis, I will explore the diversity of Netflix's content across different countries to understand how the platform tailors its offerings to various geographical regions. This analysis aims to reveal the extent of international representation, the prevalence of local content in specific markets, and the variety in genre distribution across regions. I anticipate uncovering patterns such as regional content preferences, the balance between movies and TV shows, and the inclusion of niche genres.
+
+```
+WITH SplitCountriesAndGenres AS (
+  SELECT 
+    show_id,
+    type,
+    SPLIT(country, ', ') AS country_array,
+    SPLIT(listed_in, ', ') AS genre_array
+  FROM 
+    `data-project-99299.netflix.netflix_titles`
+),
+ExplodedCountriesAndGenres AS (
+  SELECT 
+    show_id,
+    type,
+    country,
+    genre
+  FROM 
+    SplitCountriesAndGenres,
+    UNNEST(country_array) AS country,
+    UNNEST(genre_array) AS genre
+  WHERE 
+    country IS NOT NULL AND genre IS NOT NULL
+)
+SELECT 
+  country,
+  type,
+  genre,
+  COUNT(DISTINCT show_id) AS title_count
+FROM 
+  ExplodedCountriesAndGenres
+GROUP BY 
+  country, type, genre
+ORDER BY 
+  country, type, title_count DESC
+```
+
+Key Insights:
+* There's a significant representation of international movies across various countries, indicating Netflix's focus on a globally diverse content library.
+* Certain genres are more prevalent in specific regions, reflecting cultural preferences. For example, India shows a high number of dramas and comedies, while South Korea has a substantial focus on TV dramas and romantic TV shows.
+* The data indicates varied content strategies for different regions - some countries have a broader range of genres and types of content, while others have more concentrated offerings.
