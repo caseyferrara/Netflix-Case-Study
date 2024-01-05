@@ -24,7 +24,7 @@ Analyze the Netflix dataset to understand the evolution of content diversity on 
 
 * How has the distribution of different genres on Netflix changed over the years? Are certain genres becoming more or less prevalent?
 * What is the historical trend in the balance between movies and TV shows on Netflix? Is there a shift towards one content type over the other?
-* What trends are observable in the release years of content available on Netflix? Is there an inclination towards newer or older titles?
+* What trends are observable in the growth of content available on Netflix?
 * Is there a noticeable difference in content diversity when considering different geographical regions or countries, if such data is available?
 
 ## 3. Prepare
@@ -93,47 +93,49 @@ In my Genre Distribution Trends analysis, I'll explore the changes of genres on 
 ```
 WITH SplitGenres AS (
   SELECT 
-    release_year, 
+    EXTRACT(YEAR FROM DATE(date_added)) AS added_year,
     title,
     genre
   FROM 
     `data-project-99299.netflix.netflix_titles`,
     UNNEST(SPLIT(listed_in, ', ')) AS genre
+  WHERE
+    DATE(date_added) IS NOT NULL
 ),
 GenreCounts AS (
   SELECT 
-    release_year, 
+    added_year, 
     genre, 
     COUNT(title) AS title_count
   FROM 
     SplitGenres
   GROUP BY 
-    release_year, genre
+    added_year, genre
 ),
 YearlyGenreTrends AS (
   SELECT 
-    release_year, 
+    added_year, 
     genre, 
     title_count,
-    SUM(title_count) OVER (PARTITION BY release_year) AS total_titles_year,
-    (title_count / SUM(title_count) OVER (PARTITION BY release_year)) * 100 AS genre_percentage_year
+    SUM(title_count) OVER (PARTITION BY added_year) AS total_titles_year,
+    (title_count / NULLIF(SUM(title_count) OVER (PARTITION BY added_year), 0)) * 100 AS genre_percentage_year
   FROM 
     GenreCounts
 )
 SELECT 
-  release_year, 
+  added_year, 
   genre, 
   title_count,
   genre_percentage_year
 FROM 
   YearlyGenreTrends
 ORDER BY 
-  release_year, genre_percentage_year DESC
+  added_year DESC, genre_percentage_year DESC
 ```
 Key Insights:
-* In the last five years, International Movies have consistently been one of the top genres on Netflix. This indicates a strong focus on diversifying content to cater to a global audience.
-* The genre Dramas remains at the top, consistently ranking among the top three genres. This genre's popularity highlights its appeal across different viewer segments.
-* While international content and dramas dominate, there's also a notable presence of other genres like 'Comedies' and 'Documentaries', reflecting Netflix's strategy to maintain a varied content portfolio.
+* International Movies and TV Shows have become increasingly prevalent, indicating Netflix's focus on catering to a global audience. In 2021, International Movies made up about 11.56% of the content added.
+* Comedies and Action & Adventure remain popular as they are consistently appearing in the top five genres for the recent years. This reflects their universal appeal.
+* Earlier years (2010-2015) show a more limited genre distribution, which gradually expands over the years. This could be due to the expansion of Netflix's catalog and its move into original content.
 
 ### 5.2 Content Type Balance
 
@@ -142,80 +144,84 @@ I will investigate the historical trend in Netflix's catalog, specifically exami
 ```
 WITH ContentCount AS (
   SELECT 
-    release_year, 
+    EXTRACT(YEAR FROM DATE(date_added)) AS added_year, 
     type, 
     COUNT(show_id) AS count
   FROM 
     `data-project-99299.netflix.netflix_titles`
+  WHERE
+    DATE(date_added) IS NOT NULL
   GROUP BY 
-    release_year, type
+    added_year, type
 ),
 TotalCountPerYear AS (
   SELECT 
-    release_year, 
+    added_year, 
     SUM(count) AS total_count
   FROM 
     ContentCount
   GROUP BY 
-    release_year
+    added_year
 )
 SELECT 
-  a.release_year, 
+  a.added_year, 
   a.type, 
   a.count,
-  (a.count / b.total_count) * 100 AS type_percentage
+  (a.count / NULLIF(b.total_count, 0)) * 100 AS type_percentage
 FROM 
   ContentCount a
 JOIN 
-  TotalCountPerYear b ON a.release_year = b.release_year
+  TotalCountPerYear b ON a.added_year = b.added_year
 ORDER BY 
-  a.release_year, a.type
+  a.added_year, a.type
 ```
 
 Key Insights:
-* There's a clear trend showing a gradual shift from movies to TV shows. In earlier years like 2012 and 2013, movies dominated the content significantly, accounting for over 75% of the titles. However, by 2021, this trend reversed, with TV shows comprising approximately 56% of the content.
-* The increasing percentage of TV shows from 2015 onwards, with a notable jump around 2019-2020, reflects Netflix's emphasis on serialized content. This could be in response to consumer preferences for binge-watching and the success of original series.
-* This shift might be part of a broader diversification strategy, aiming to offer a more balanced mix of movies and series to cater to varied viewer preferences and compete with other streaming services.
+* Starting in 2013, there's a noticeable increase in the percentage of TV shows being added. By 2015, nearly a third of the content added was TV shows, indicating a strategic shift towards increasing TV show offerings.
+* From 2018 onwards, the percentage of movies added consistently remains higher than TV shows, but the gap narrows compared to the early years. Movies maintain a majority but with a considerable and stable presence of TV shows, indicating a more balanced approach in content strategy.
+* While movies remain dominant, the increase in TV shows reflects Netflix's strategy to offer a more diverse and balanced range of content.
 
-### 5.3 Release Year Analysis
+### 5.3 Year-over-Year Growth
 
-I decided to calculate the yearly growth rate in the number of titles on Netflix, aiming to identify trends in their content strategy. This approach allows us to quantify the year-over-year changes in Netflix's content library, offering insights into periods of significant expansion or strategic shifts. By analyzing these growth rates, we can figure out whether there has been an acceleration in adding new content, which indicates a focus on keeping the library fresh and up-to-date. Alternatively, steady or moderate growth rates might suggest a more balanced approach, maintaining a mix of new and existing titles.
+I decided to calculate the yearly growth rate in the number of titles added on Netflix, aiming to identify trends in their content strategy. This approach allows us to quantify the year-over-year changes in Netflix's content library, offering insights into periods of significant expansion or strategic shifts. By analyzing these growth rates, we can figure out whether there has been an acceleration in adding new content, which indicates a focus on keeping the library fresh and up-to-date. Alternatively, steady or moderate growth rates might suggest a more balanced approach, maintaining a mix of new and existing titles.
 
 ```
 WITH YearlyTitleCount AS (
   SELECT 
-    release_year,
+    EXTRACT(YEAR FROM DATE(date_added)) AS added_year,
     COUNT(show_id) AS title_count
   FROM 
     `data-project-99299.netflix.netflix_titles`
+  WHERE
+    DATE(date_added) IS NOT NULL
   GROUP BY 
-    release_year
+    added_year
 ),
 YearlyGrowth AS (
   SELECT 
-    release_year,
+    added_year,
     title_count,
-    LAG(title_count) OVER (ORDER BY release_year) AS previous_year_count
+    LAG(title_count) OVER (ORDER BY added_year) AS previous_year_count
   FROM 
     YearlyTitleCount
 )
 SELECT 
-  release_year,
+  added_year,
   title_count,
   previous_year_count,
-  ((title_count - previous_year_count) / previous_year_count) * 100 AS growth_rate
+  ((title_count - previous_year_count) / NULLIF(previous_year_count, 0)) * 100 AS growth_rate
 FROM 
   YearlyGrowth
 WHERE 
   previous_year_count IS NOT NULL
 ORDER BY 
-  release_year DESC
+  added_year DESC
 ```
 
 Key Insights:
-* Between 2015 and 2016, there's a marked increase in the growth rate, with 2016 showing a 62.84% increase in title count from the previous year. This period likely represents a phase of aggressive expansion in Netflix's content library.
-* The variation in growth rates, especially in recent years, could reflect Netflix's response to the evolving streaming market, viewer preferences, and competition.
-* The data suggests a strategic curation of content by Netflix, balancing the addition of new titles with the removal of existing ones, possibly to maintain a relevant catalog.
+* There was a surge in the number of titles added between 2016 and 2017, with the growth rate peaking at 173.66%. This period likely marks a strategic shift by Netflix towards expanding its content library, possibly aligning with a push for more original content and global expansion.
+* Post-2017, the growth rate starts to normalize in 2018 (36.36%) but then shows a gradual decline, leading to a reduction in 2021 (-35.63%). This downturn could indicate a shift in strategy, perhaps focusing more on quality over quantity.
+* The high growth rates in certain years suggest a focus on diversifying the content library to cater to a broadening subscriber base and to compete in the streaming market.
 
 ### 5.4 Geographical Variance
 
