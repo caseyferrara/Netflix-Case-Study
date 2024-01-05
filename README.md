@@ -267,3 +267,17 @@ Key Insights:
 * There's a significant representation of international movies across various countries, indicating Netflix's focus on a globally diverse content library.
 * Certain genres are more prevalent in specific regions, reflecting cultural preferences. For example, India shows a high number of dramas and comedies, while South Korea has a substantial focus on TV dramas and romantic TV shows.
 * The data indicates varied content strategies for different regions - some countries have a broader range of genres and types of content, while others have more concentrated offerings.
+
+### 6. Share
+
+[The Evolution of Content Diversity on Netflix](https://public.tableau.com/views/TheEvolutionofContentDiversityonNetflix/Dashboard1?:language=en-US&:display_count=n&:origin=viz_share_link)
+
+I leveraged Tableau to create visualizations that bring to life the insights derived from our analysis of Netflix's content diversity. These visualizations effectively communicate key trends and patterns, providing an engaging way to interpret the data. Here are some highlights showcased in the visualizations:
+
+* The stacked bar chart reveals the evolving landscape of genre preferences on Netflix. Dramas and International Movies consistently dominate, indicating Netflix's commitment to cater to diverse tastes and global audiences. The rise in genres like Documentaries and Stand-Up Comedy underscores a strategy to offer varied content.
+* The area chart visualizes the historical trend between movies and TV shows. Initially dominated by movies, there's a noticeable increase in TV shows over the years, reflecting Netflix's strategic shift towards a more balanced content offering.
+* The map visualization presents the diverse range of content available from different regions. This diversity in content origin reflects the platform's aim to appeal to a worldwide audience.
+
+Each visualization in the dashboard is not just a representation of data but tells a story about Netflix's strategic evolution in content diversity, offering insights about the platform's market positioning and future trends.
+
+
