@@ -6,7 +6,7 @@ This study will analyze how the variety of genres and the balance between movies
 
 ### 1.1 Purpose Statement
 
-The streaming market is increasingly competitive, with numerous platforms vying for viewers' attention. Netflix needs to understand the evolution of its content diversity to stay relevant and appealing to a broad audience. Are they diversifying their content offerings effectively over time? 
+The streaming market is increasingly competitive, with numerous platforms competing for viewers' attention. Netflix needs to understand the evolution of its content diversity to stay relevant and appealing to a broad audience. Are they diversifying their content offerings effectively over time? 
 
 ## 2. Ask
 
@@ -58,7 +58,7 @@ There are 12 columns in the dataset, each representing a different attribute of 
 
 ## 4. Process
 
-For the analysis of the Netflix dataset, I chose due to its proficiency in handling and querying large datasets efficiently. Its compatibility with structured data formats allows for easy manipulation and extraction of insights from the dataset's diverse content. SQL's capabilities for complex queries are essential for in-depth analysis of genre distribution, content types, and temporal trends. SQL's integration with data visualization tools make it an ideal tool for reliable and effective data analysis, ensuring both accuracy and consistency in the derived insights.
+For the analysis of the Netflix dataset, I chose SQL due to its proficiency in handling and querying large datasets efficiently. Its compatibility with structured data formats allows for easy manipulation and extraction of insights from the dataset's diverse content. SQL's capabilities for complex queries are essential for in-depth analysis of genre distribution, content types, and temporal trends. SQL's integration with data visualization tools make it an ideal tool for reliable and effective data analysis.
 
 ### 4.1 Cleaning the Data
 
@@ -84,11 +84,11 @@ After completing the data cleaning process in Google Sheets, I started importing
 
 ## 5. Analyze
 
-In our analysis phase, I'm focusing on key aspects of Netflix's content evolution. I'll examine genre distribution over time to see which genres have become more or less prevalent, reflecting shifts in viewer preferences. Another aspect is the balance between movies and TV shows, determining if there's a trend favoring one content type. We'll also analyze the release years of titles to understand if Netflix is focusing on newer or older content. Additionally, we'll explore content diversity across different geographical regions to see if Netflix's library varies by region. This analysis aims to provide a nuanced understanding of how Netflix's content strategy has evolved, offering insights for data-driven decisions.
+In the analyze phase, I'm focusing on key aspects of Netflix's content evolution. I'll examine genre distribution over time to see which genres have become more or less prevalent, reflecting shifts in viewer preferences. Another aspect is the balance between movies and TV shows, determining if there's a trend favoring one content type. I'll also analyze the year-over-year growth of Netlfix's content to help us understand their content strategy. Additionally, I'll explore content diversity across different geographical regions to see if Netflix's library varies by region. This analysis aims to provide an understanding of how Netflix's content strategy has evolved, offering insights for data-driven decisions.
 
 ### 5.1 Genre Distribution Trends
 
-In my Genre Distribution Trends analysis, I'll explore the changes of genres on Netflix over the years. This will reveal shifts in viewer preferences and adaptations in Netflix's portfolio. My focus will be on identifying trends. This analysis aims to understand Netflix's content diversification strategy which will provide insights into its content acquisition and production decisions.
+I'll explore the changes of genres on Netflix over the years. This will reveal shifts in viewer preferences and adaptations in Netflix's portfolio. My focus will be on identifying trends. This analysis aims to understand Netflix's content diversification strategy which will provide insights into its content acquisition and production decisions.
 
 ```
 WITH SplitGenres AS (
@@ -139,7 +139,7 @@ Key Insights:
 
 ### 5.2 Content Type Balance
 
-I will investigate the historical trend in Netflix's catalog, specifically examining the balance between movies and TV shows over time. This analysis will utilize SQL queries to quantify and compare the proportions of movies and TV shows released each year, which will reveal any shifts in Netflix's content strategy. I want to determine whether there's a noticeable trend towards either movies or TV series, reflecting on how Netflix adapts its content offerings in response to consumer preferences and market trends.
+I will investigate the historical trend in Netflix's catalog, specifically examining the balance between movies and TV shows over time. This analysis will utilize SQL queries to quantify and compare the proportions of movies and TV shows added each year, which will reveal any shifts in Netflix's content strategy. I want to determine whether there's a noticeable trend towards either movies or TV series, reflecting on how Netflix adapts its content offerings in response to consumer preferences and market trends.
 
 ```
 WITH ContentCount AS (
@@ -183,7 +183,7 @@ Key Insights:
 
 ### 5.3 Year-over-Year Growth
 
-I decided to calculate the yearly growth rate in the number of titles added on Netflix, aiming to identify trends in their content strategy. This approach allows us to quantify the year-over-year changes in Netflix's content library, offering insights into periods of significant expansion or strategic shifts. By analyzing these growth rates, we can figure out whether there has been an acceleration in adding new content, which indicates a focus on keeping the library fresh and up-to-date. Alternatively, steady or moderate growth rates might suggest a more balanced approach, maintaining a mix of new and existing titles.
+I decided to calculate the yearly growth rate in the number of titles added on Netflix, aiming to identify trends in their content strategy. This approach allows us to quantify the year-over-year changes in Netflix's content library, offering insights into periods of significant expansion or strategic shifts. By analyzing these growth rates, we can figure out whether there has been an acceleration in adding new content, which indicates a focus on keeping the library fresh and up-to-date.
 
 ```
 WITH YearlyTitleCount AS (
