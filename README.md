@@ -281,7 +281,7 @@ Key Insights:
 * Certain genres are more prevalent in specific regions, reflecting cultural preferences. For example, India shows a high number of dramas and comedies, while South Korea has a substantial focus on TV dramas and romantic TV shows.
 * The data indicates varied content strategies for different regions - some countries have a broader range of genres and types of content, while others have more concentrated offerings.
 
-### 6. Share
+## 6. Share
 
 [The Evolution of Content Diversity on Netflix](https://public.tableau.com/views/TheEvolutionofContentDiversityonNetflix/Dashboard1?:language=en-US&:display_count=n&:origin=viz_share_link)
 
