@@ -91,17 +91,19 @@ In the analyze phase, I'm focusing on key aspects of Netflix's content evolution
 I'll explore the changes of genres on Netflix over the years. This will reveal shifts in viewer preferences and adaptations in Netflix's portfolio. My focus will be on identifying trends. This analysis aims to understand Netflix's content diversification strategy which will provide insights into its content acquisition and production decisions.
 
 ```
+-- Splitting genres and extracting the year from the date_added
 WITH SplitGenres AS (
   SELECT 
-    EXTRACT(YEAR FROM DATE(date_added)) AS added_year,
+    EXTRACT(YEAR FROM DATE(date_added)) AS added_year, -- Extracting year from date_added
     title,
     genre
   FROM 
     `data-project-99299.netflix.netflix_titles`,
-    UNNEST(SPLIT(listed_in, ', ')) AS genre
+    UNNEST(SPLIT(listed_in, ', ')) AS genre -- Splitting genres into separate rows
   WHERE
-    DATE(date_added) IS NOT NULL
+    DATE(date_added) IS NOT NULL -- Filtering out rows with null dates
 ),
+-- Counting titles per genre for each year
 GenreCounts AS (
   SELECT 
     added_year, 
@@ -112,16 +114,18 @@ GenreCounts AS (
   GROUP BY 
     added_year, genre
 ),
+-- Calculating the percentage of each genre per year
 YearlyGenreTrends AS (
   SELECT 
     added_year, 
     genre, 
     title_count,
-    SUM(title_count) OVER (PARTITION BY added_year) AS total_titles_year,
-    (title_count / NULLIF(SUM(title_count) OVER (PARTITION BY added_year), 0)) * 100 AS genre_percentage_year
+    SUM(title_count) OVER (PARTITION BY added_year) AS total_titles_year, -- Total titles per year
+    (title_count / NULLIF(SUM(title_count) OVER (PARTITION BY added_year), 0)) * 100 AS genre_percentage_year -- Genre percentage calculation
   FROM 
     GenreCounts
 )
+-- Final selection of the year, genre, title count, and genre percentage
 SELECT 
   added_year, 
   genre, 
@@ -130,7 +134,7 @@ SELECT
 FROM 
   YearlyGenreTrends
 ORDER BY 
-  added_year DESC, genre_percentage_year DESC
+  added_year DESC, genre_percentage_year DESC; -- Ordering by year and genre percentage
 ```
 Key Insights:
 * International Movies and TV Shows have become increasingly prevalent, indicating Netflix's focus on catering to a global audience. In 2021, International Movies made up about 11.56% of the content added.
@@ -142,9 +146,10 @@ Key Insights:
 I will investigate the historical trend in Netflix's catalog, specifically examining the balance between movies and TV shows over time. This analysis will utilize SQL queries to quantify and compare the proportions of movies and TV shows added each year, which will reveal any shifts in Netflix's content strategy. I want to determine whether there's a noticeable trend towards either movies or TV series, reflecting on how Netflix adapts its content offerings in response to consumer preferences and market trends.
 
 ```
+-- Calculating content count by type and year
 WITH ContentCount AS (
   SELECT 
-    EXTRACT(YEAR FROM DATE(date_added)) AS added_year, 
+    EXTRACT(YEAR FROM DATE(date_added)) AS added_year, -- Extracting year from date_added
     type, 
     COUNT(show_id) AS count
   FROM 
@@ -154,6 +159,7 @@ WITH ContentCount AS (
   GROUP BY 
     added_year, type
 ),
+-- Summing the total count per year
 TotalCountPerYear AS (
   SELECT 
     added_year, 
@@ -163,6 +169,7 @@ TotalCountPerYear AS (
   GROUP BY 
     added_year
 )
+-- Selecting the year, type, count, and calculating the percentage of type
 SELECT 
   a.added_year, 
   a.type, 
@@ -173,7 +180,7 @@ FROM
 JOIN 
   TotalCountPerYear b ON a.added_year = b.added_year
 ORDER BY 
-  a.added_year, a.type
+  a.added_year, a.type; -- Ordering by year and type
 ```
 
 Key Insights:
@@ -186,9 +193,10 @@ Key Insights:
 I decided to calculate the yearly growth rate in the number of titles added on Netflix, aiming to identify trends in their content strategy. This approach allows us to quantify the year-over-year changes in Netflix's content library, offering insights into periods of significant expansion or strategic shifts. By analyzing these growth rates, we can figure out whether there has been an acceleration in adding new content, which indicates a focus on keeping the library fresh and up-to-date.
 
 ```
+-- Calculating the yearly title count
 WITH YearlyTitleCount AS (
   SELECT 
-    EXTRACT(YEAR FROM DATE(date_added)) AS added_year,
+    EXTRACT(YEAR FROM DATE(date_added)) AS added_year, -- Extracting year from date_added
     COUNT(show_id) AS title_count
   FROM 
     `data-project-99299.netflix.netflix_titles`
@@ -197,14 +205,16 @@ WITH YearlyTitleCount AS (
   GROUP BY 
     added_year
 ),
+-- Calculating growth by comparing with the previous year
 YearlyGrowth AS (
   SELECT 
     added_year,
     title_count,
-    LAG(title_count) OVER (ORDER BY added_year) AS previous_year_count
+    LAG(title_count) OVER (ORDER BY added_year) AS previous_year_count -- Calculating previous year's count
   FROM 
     YearlyTitleCount
 )
+-- Selecting year, title count, previous year count, and calculating growth rate
 SELECT 
   added_year,
   title_count,
@@ -215,7 +225,7 @@ FROM
 WHERE 
   previous_year_count IS NOT NULL
 ORDER BY 
-  added_year DESC
+  added_year DESC; -- Ordering by year in descending order
 ```
 
 Key Insights:
@@ -228,15 +238,17 @@ Key Insights:
 In my Geographical Variance analysis, I will explore the diversity of Netflix's content across different countries to understand how the platform tailors its offerings to various geographical regions. This analysis aims to reveal the extent of international representation, the prevalence of local content in specific markets, and the variety in genre distribution across regions. I anticipate uncovering patterns such as regional content preferences, the balance between movies and TV shows, and the inclusion of niche genres.
 
 ```
+-- Splitting countries and genres, then counting titles per country, type, and genre
 WITH SplitCountriesAndGenres AS (
   SELECT 
     show_id,
     type,
-    SPLIT(country, ', ') AS country_array,
-    SPLIT(listed_in, ', ') AS genre_array
+    SPLIT(country, ', ') AS country_array, -- Splitting country into an array
+    SPLIT(listed_in, ', ') AS genre_array -- Splitting genre into an array
   FROM 
     `data-project-99299.netflix.netflix_titles`
 ),
+-- Unnesting country and genre arrays
 ExplodedCountriesAndGenres AS (
   SELECT 
     show_id,
@@ -245,11 +257,12 @@ ExplodedCountriesAndGenres AS (
     genre
   FROM 
     SplitCountriesAndGenres,
-    UNNEST(country_array) AS country,
-    UNNEST(genre_array) AS genre
+    UNNEST(country_array) AS country, -- Unnesting country array
+    UNNEST(genre_array) AS genre -- Unnesting genre array
   WHERE 
     country IS NOT NULL AND genre IS NOT NULL
 )
+-- Selecting country, type, genre, and counting distinct show IDs
 SELECT 
   country,
   type,
@@ -260,7 +273,7 @@ FROM
 GROUP BY 
   country, type, genre
 ORDER BY 
-  country, type, title_count DESC
+  country, type, title_count DESC; -- Ordering by country, type, and title count
 ```
 
 Key Insights:
