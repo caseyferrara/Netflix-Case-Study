@@ -291,6 +291,14 @@ I leveraged Tableau to create visualizations that bring to life the insights der
 * The area chart visualizes the historical trend between movies and TV shows. Initially dominated by movies, there's a noticeable increase in TV shows over the years, reflecting Netflix's strategic shift towards a more balanced content offering.
 * The map visualization presents the diverse range of content available from different regions. This diversity in content origin reflects the platform's aim to appeal to a worldwide audience.
 
+
 Each visualization in the dashboard is not just a representation of data but tells a story about Netflix's strategic evolution in content diversity, offering insights about the platform's market positioning and future trends.
 
+## 7. Act
 
+Based on the insights from the analysis, the following recommendations can be made to enhance Netflix's marketing strategy:
+
+* Given the rising popularity of International Movies and Dramas, Netflix should consider tailoring its marketing campaigns to highlight these genres, particularly in regions where they are most popular, to attract and retain a diverse global audience.
+* The yearly growth in content can be a key point in marketing narratives, highlighting Netflix's commitment to constantly expanding and diversifying its content library to meet viewer preferences.
+* Leveraging data insights from the analysis, Netflix can further personalize its user experience, recommending content based on popular genres or trends in specific regions, which will enhance user engagement.
+* Partner with creators and studios known for content in trending genres or from diverse geographical regions, to co-create exclusive content, which can be marketed as unique offerings available only on Netflix.
